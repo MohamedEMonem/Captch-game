@@ -17,7 +17,7 @@ This project is built using HTML, CSS, and JavaScript, and incorporates SVG imag
 
 ## Demo
 
-You can try the game live by visiting the [live demo link](#).
+You can try the game live by visiting the [live demo link](https://mohamedemonem.github.io/Captch-game/).
 
 ## Installation
 

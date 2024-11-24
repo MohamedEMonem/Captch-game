@@ -25,21 +25,20 @@ To set up this project locally:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/svg-image-clicker.git
+   git clone https://github.com/MohamedEMonem/Captch-game.git
    ```
 
 2. Navigate to the project folder:
    ```bash
-   cd svg-image-clicker
+   cd Captch-game
    ```
 
 3. Open the `index.html` file in your preferred browser:
    ```bash
-   open index.html  # on macOS
+   open index.html  
    # or just double-click index.html on other operating systems
    ```
 
-4. Start playing the game!
 
 ## How It Works
 
@@ -55,7 +54,7 @@ To set up this project locally:
 4. **Finish Button**  
    Once all objects are selected correctly, a "Finish" button appears, allowing the user to finish the game and reset it for a new round.
 
-## Game Flow
+## Flow
 
 - The game will prompt the user with a message to click on a specific object.
 - The user interacts with a grid of randomly displayed SVG objects.
@@ -66,9 +65,8 @@ To set up this project locally:
 ## File Structure
 
 ```
-/svg-image-clicker
+/Captch-game
   ├── index.html         # Main HTML file
-  ├── style.css          # CSS for styling the game
   ├── script.js          # JavaScript for game logic
   ├── /img               # Folder for storing SVG image files (bird.svg, house.svg, etc.)
       ├── bird.svg
@@ -105,13 +103,13 @@ If you'd like to contribute to this project:
 4. Push to the branch (`git push origin feature/your-feature`)
 5. Create a new Pull Request
 
-## License
+<!-- ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. -->
 
 ## Acknowledgments
 
-- The SVG images used in this game are placeholders and can be replaced with any other images you prefer. You can find free SVG images on websites like [Heroicons](https://heroicons.com/) or [unDraw](https://undraw.co/).
+- The SVG images used in this game are placeholders and can be replaced with any other images you prefer.
 
 ---
 

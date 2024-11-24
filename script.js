@@ -87,6 +87,15 @@ async function createCompositeImage(container) {
 function handleClick(object, element) {
     const message = document.getElementById("message");
 
+    // Check if the object has already been clicked
+    if (element.classList.contains("clicked")) {
+        updateMessage("You've already clicked this object. Try another one!");
+        return; // Prevent further action if already clicked
+    }
+
+    // Mark the object as clicked
+    element.classList.add("clicked");
+
     if (object === correctObject) {
         element.closest("div").classList.add("correct");
         selectedObjects++;

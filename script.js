@@ -2,7 +2,12 @@ const svgSources = {
     bird: "img/bird.svg", 
     house: "img/house.svg", 
     tree: "img/tree.svg", 
-    car: "img/car.svg"
+    car: "img/car.svg",
+    monkey: "img/monkey.svg",
+    sun: "img/sun.svg",
+    cloud: "img/cloud.svg",
+    rose: "img/rose.svg",
+    apple: "img/apple.svg",
 };
 
 let correctObject = ""; 
@@ -32,12 +37,14 @@ function updateMessage(messageText) {
 
 function getRandomFigures() {
     const figures = Object.keys(svgSources);
-    const randomFigures = [];
-    for (let i = 0; i < 4; i++) {
+    const uniqueFigures = new Set();
+
+    while (uniqueFigures.size < 4) {
         const randomIndex = Math.floor(Math.random() * figures.length);
-        randomFigures.push(figures[randomIndex]);
+        uniqueFigures.add(figures[randomIndex]);
     }
-    return randomFigures;
+
+    return Array.from(uniqueFigures);
 }
 
 async function createCompositeImage(container) {

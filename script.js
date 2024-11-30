@@ -13,7 +13,7 @@ const svgSources = {
 let correctObject = ""; 
 let selectedObjects = 0; 
 
-// Modify the fetchSVG function to use 'no-cors' mode
+// Fetch SVG
 async function fetchSVG(url) {
     try {
         const response = await fetch(url, { mode: 'no-cors' });
@@ -25,29 +25,45 @@ async function fetchSVG(url) {
     }
 }
 
+// Randomize the correct object
 function randomizeCorrectObject() {
     const objects = Object.keys(svgSources);
     correctObject = objects[Math.floor(Math.random() * objects.length)];
 }
 
+// Update the game message
 function updateMessage(messageText) {
     const message = document.getElementById("OBJmessage");
     message.textContent = messageText;
 }
 
-function getRandomFigures() {
-    const figures = Object.keys(svgSources);
-    const uniqueFigures = new Set();
+// Initialize the grid and ensure correct objects are spread across the grid
+async function initializeGrid() {
+    const imageGrid = document.getElementById("imageGrid");
+    imageGrid.innerHTML = ""; // Clear the grid for a new game
+    const totalGrids = 9; // Number of grid cells
+    const correctObjectCount = 4; // Ensure 4 correct objects
 
-    while (uniqueFigures.size < 4) {
-        const randomIndex = Math.floor(Math.random() * figures.length);
-        uniqueFigures.add(figures[randomIndex]);
+    const positions = Array.from({ length: totalGrids }, (_, i) => i);
+    const shuffledPositions = positions.sort(() => Math.random() - 0.5);
+    const correctPositions = shuffledPositions.slice(0, correctObjectCount);
+
+    for (let i = 0; i < totalGrids; i++) {
+        const div = document.createElement("div");
+
+        // If this is a correct position, include the correct object
+        if (correctPositions.includes(i)) {
+            await createCompositeImage(div, correctObject, true);
+        } else {
+            await createCompositeImage(div, correctObject, false);
+        }
+
+        imageGrid.appendChild(div);
     }
-
-    return Array.from(uniqueFigures);
 }
 
-async function createCompositeImage(container) {
+// Create a composite image with 4 smaller SVG objects in a grid
+async function createCompositeImage(container, correctObject, includeCorrect) {
     const svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svgContainer.setAttribute("width", "200");
     svgContainer.setAttribute("height", "200");
@@ -60,13 +76,37 @@ async function createCompositeImage(container) {
         { x: 100, y: 100 },
     ];
 
-    const randomFigures = getRandomFigures();
-    let index = 0;
+    const figures = Object.keys(svgSources);
+    const objectsToInclude = [];
 
-    for (const figure of randomFigures) {
-        const svgContent = await fetchSVG(svgSources[figure]);
+    if (includeCorrect) {
+        // Ensure the correct object is included exactly once
+        objectsToInclude.push(correctObject);
+        while (objectsToInclude.length < 4) {
+            const randomObject = figures[Math.floor(Math.random() * figures.length)];
+            if (!objectsToInclude.includes(randomObject)) {
+                objectsToInclude.push(randomObject);
+            }
+        }
+    } else {
+        // Exclude the correct object and pick 4 random objects
+        while (objectsToInclude.length < 4) {
+            const randomObject = figures[Math.floor(Math.random() * figures.length)];
+            if (randomObject !== correctObject && !objectsToInclude.includes(randomObject)) {
+                objectsToInclude.push(randomObject);
+            }
+        }
+    }
+
+    // Shuffle objects to randomize their positions
+    objectsToInclude.sort(() => Math.random() - 0.5);
+
+    for (let i = 0; i < cornerPositions.length; i++) {
+        const object = objectsToInclude[i];
+        const svgContent = await fetchSVG(svgSources[object]);
+
         const gElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        gElement.setAttribute("id", figure);
+        gElement.setAttribute("id", object);
         gElement.innerHTML = svgContent;
 
         const svgElement = gElement.querySelector("svg");
@@ -76,72 +116,56 @@ async function createCompositeImage(container) {
             svgElement.setAttribute("preserveAspectRatio", "xMidYMid meet");
         }
 
-        const position = cornerPositions[index];
+        const position = cornerPositions[i];
         gElement.setAttribute("transform", `translate(${position.x}, ${position.y})`);
 
-        gElement.addEventListener('click', () => handleClick(figure, gElement));
+        gElement.addEventListener('click', () => handleClick(object, gElement));
 
         svgContainer.appendChild(gElement);
-
-        index++;
-        if (index >= cornerPositions.length) break;
     }
 
     container.appendChild(svgContainer);
 }
 
-// Handle user click on an SVG object
+// Handle user clicks
 function handleClick(object, element) {
-    const message = document.getElementById("message");
-
-    // Check if the object has already been clicked
     if (element.classList.contains("clicked")) {
         updateMessage("You've already clicked this object. Try another one!");
-        return; // Prevent further action if already clicked
+        return;
     }
 
-    // Mark the object as clicked
     element.classList.add("clicked");
 
     if (object === correctObject) {
-        element.closest("div").classList.add("correct");
         selectedObjects++;
         updateMessage(`Correct! ${selectedObjects} out of 4 objects selected.`);
+        element.closest("div").classList.add("correct");
 
         if (selectedObjects === 4) {
             document.getElementById("finishButton").classList.add("show");
         }
     } else {
-        element.closest("div").classList.add("incorrect");
-        updateMessage(`Incorrect. Try again! The correct object is a ${correctObject}.`);
-        resetGame(); // Reset the game if the wrong object is clicked
+        updateMessage(`Incorrect! The correct object is a ${correctObject}. Try again!`);
+        resetGame();
     }
 }
 
+// Reset the game
 function resetGame() {
     selectedObjects = 0;
     document.getElementById("finishButton").classList.remove("show");
-    const imageGrid = document.getElementById("imageGrid");
-    imageGrid.innerHTML = ""; 
-    randomizeCorrectObject(); // Randomize the correct object after resetting the game
-    updateMessage(`Click on the ${correctObject}`); // Update the message with the new correct object
-    initializeGrid(); 
+    randomizeCorrectObject(); // Randomize the correct object for the next round
+    updateMessage(`Click on the ${correctObject}`);
+    initializeGrid(); // Reinitialize the grid
 }
 
-async function initializeGrid() {
-    const imageGrid = document.getElementById("imageGrid");
-    for (let i = 0; i < 9; i++) {
-        const div = document.createElement("div");
-        await createCompositeImage(div);  
-        imageGrid.appendChild(div);
-    }
-}
-
+// Initialize the game
 document.getElementById("finishButton").addEventListener('click', () => {
     alert("Congratulations! You've finished!");
     resetGame();
 });
 
-randomizeCorrectObject(); 
+// Start the game
+randomizeCorrectObject();
 updateMessage(`Click on the ${correctObject}`);
 initializeGrid();
